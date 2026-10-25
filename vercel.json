@@ -1,5 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/verify-offer.js": {
+      "maxDuration": 60,
+      "includeFiles": "node_modules/{tesseract.js,tesseract.js-core,@tesseract.js-data/eng,wasm-feature-detect,is-url,bmp-js,zlibjs,regenerator-runtime}/**"
+    }
+  },
   "headers": [
     {
       "source": "/(.*)",

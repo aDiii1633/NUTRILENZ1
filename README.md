@@ -6,6 +6,8 @@ A responsive rewards website and a separately deployable content administration 
 
 **New: [two-step Loomii offer and screenshot database setup](OFFERS-SETUP.md).** Main earning buttons open the offer page; the admin's Offer submissions inbox reviews screenshots and unlocks App20 after approval. Requires the additional SQL migration and anonymous sign-in configuration in that guide.
 
+**Screenshot checker: [setup, checks and limitations](IMAGE-CHECKS.md).** Includes private server-side OCR, duplicate fingerprints, per-user references, admin reports and an anonymized example-image dialog. Requires the image-verification SQL migration and a server-only Supabase service-role environment variable.
+
 ## Applications
 
 | Application | Local command | Production build | Output |

@@ -4,6 +4,7 @@ import './offer.css';
 
 let client;
 let record = null;
+let challenge = null;
 let working = false;
 let previewUrl;
 let requestVersion = 0;
@@ -35,6 +36,21 @@ function render() {
     for(const [field,key] of [['name','participant_name'],['username','loomii_username']])panel.querySelector(`[name="${field}"]`).value=record[key];
   }
   body.append(panel);
+  const exampleButton=el('button','Show example image','button secondary example-image-button');
+  exampleButton.type='button';exampleButton.addEventListener('click',()=>{
+    const modal=document.createElement('dialog');modal.className='example-dialog';modal.setAttribute('aria-label','Example review screenshot');
+    const close=el('button','×','close-dialog');close.setAttribute('aria-label','Close example image');close.addEventListener('click',()=>modal.close());
+    const image=document.createElement('img');image.src='/images/review-example.png';image.alt='Illustrative Loomii review screenshot with a mocked Demo User identity.';
+    modal.append(close,el('h2','Example screenshot'),el('p','Illustration only. Use your own screenshot and assigned reference, not this example.'),image);document.body.append(modal);modal.addEventListener('close',()=>modal.remove());modal.showModal();
+  });
+  panel.querySelector('.offer-instructions li:last-child').append(exampleButton);
+  const reference=el('div','','verification-reference');
+  reference.append(el('h3','Your unique verification text'),el('p','Write about your own actual experience. Add this reference line to your review so we can match your screenshot to your submission.'));
+  const text=el('p',challenge?.review_text||'Your reference will appear when secure submissions are available.','reference-text');reference.append(text);
+  const copy=el('button','Copy verification text','button secondary');copy.type='button';copy.disabled=!challenge;
+  copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(challenge.review_text);copy.textContent='Copied ✓';}catch{copy.textContent='Select and copy the text above';}});reference.append(copy);
+  panel.querySelector('hr').before(reference);
+  $('#submit-proof').disabled=!challenge;
   $('#proof-file').addEventListener('change',async event=>{
     clearPreview();$('#proof-preview').hidden=true;$('#proof-error').textContent='';
     try{const file=event.target.files[0];validateScreenshot(file);previewUrl=URL.createObjectURL(file);$('#proof-preview').src=previewUrl;$('#proof-preview').hidden=false;}
@@ -53,7 +69,7 @@ async function ensureSession() {
 }
 async function refreshRecord() {
   if(working)return; working=true;const version=++requestVersion;message('Checking your submission…');
-  try {await ensureSession();const {data,error}=await client.from('offer_submissions').select('*').eq('user_id',(await client.auth.getSession()).data.session.user.id).maybeSingle();if(error)throw error;if(version!==requestVersion)return;record=data;render();message(data?.status==='approved'?'Step 1 approved. You can continue to step 2.':data?.status==='pending'?'Your submission is saved and awaiting admin verification.':'Follow the instructions below to complete step 1.');}
+  try {await ensureSession();const assigned=await client.rpc('get_offer_challenge');if(assigned.error)throw new Error('Secure image checks are not active yet. Please check back soon.');challenge=assigned.data;const {data,error}=await client.from('offer_submissions').select('*').eq('user_id',(await client.auth.getSession()).data.session.user.id).maybeSingle();if(error)throw error;if(version!==requestVersion)return;record=data;render();message(data?.status==='approved'?'Step 1 approved. You can continue to step 2.':data?.status==='pending'?'Your submission is saved and awaiting admin verification.':'Follow the instructions below to complete step 1.');}
   catch(error){message(error.message,true);render();}finally{working=false;}
 }
 async function submitProof(event) {
@@ -61,14 +77,19 @@ async function submitProof(event) {
   let path;
   try {
     const details=validateSubmission(Object.fromEntries(new FormData(form)));const file=form.elements.screenshot.files[0];validateScreenshot(file);
+    if(!challenge)throw new Error('Your secure verification reference is not available yet. Please refresh and try again.');
     if(!form.elements.consent.checked)throw new Error('Please consent to storing your verification details.');
     // Decode before upload so renamed/non-image files are rejected.
     const bitmap=await createImageBitmap(file);if(bitmap.width>12000||bitmap.height>12000){bitmap.close();throw new Error('Screenshot dimensions are too large. Please use a smaller image.');}bitmap.close();
     working=true;$('#submit-proof').disabled=true;$('#submit-proof').textContent='Uploading screenshot…';
     const user=await ensureSession();const ext={'image/png':'png','image/jpeg':'jpg','image/webp':'webp'}[file.type];path=`${user.id}/${crypto.randomUUID()}.${ext}`;
     const upload=await client.storage.from('offer-screenshots').upload(path,file,{contentType:file.type,upsert:false});if(upload.error)throw upload.error;
-    const result=await client.rpc('submit_offer_proof',{p_name:details.name,p_email:null,p_username:details.username,p_screenshot:path});
-    if(result.error)throw result.error;record=result.data;path=null;render();message('Screenshot uploaded successfully. Your submission is awaiting admin verification.');
+    $('#submit-proof').textContent='Checking screenshot…';
+    const session=await client.auth.getSession();
+    const response=await fetch('/api/verify-offer',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${session.data.session.access_token}`},body:JSON.stringify({...details,path})});
+    const result=await response.json().catch(()=>({error:'Image checking is temporarily unavailable. Please try again later.'}));
+    if(!response.ok)throw new Error(result.error||'Screenshot could not be checked.');
+    record=result.submission;path=null;render();message('Image checks completed. Your submission is now awaiting final admin verification.');
   }catch(error){if(path&&client)await client.storage.from('offer-screenshots').remove([path]);if($('#proof-error'))$('#proof-error').textContent=error.message;else message(error.message,true);}
   finally {working=false;if($('#submit-proof')){$('#submit-proof').disabled=false;$('#submit-proof').textContent='Submit for verification ↗';}}
 }
