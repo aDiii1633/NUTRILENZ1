@@ -4,7 +4,7 @@ create table public.offer_submissions (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null unique references auth.users(id) on delete cascade,
   participant_name text not null check (length(participant_name) between 2 and 100),
-  email text not null check (length(email) between 5 and 254),
+  email text, -- Legacy field; new submissions do not collect or store email.
   loomii_username text not null check (length(loomii_username) between 2 and 80),
   screenshot_path text not null,
   status text not null default 'pending' check (status in ('pending','approved','rejected')),
@@ -61,10 +61,9 @@ begin
   if uid is null then raise exception 'A secure session is required'; end if;
   -- Serialize submissions for the same identity, including initial inserts.
   perform pg_advisory_xact_lock(hashtext(uid::text));
-  p_name:=trim(p_name);p_email:=lower(trim(p_email));p_username:=trim(p_username);
-  if p_name is null or length(p_name) not between 2 and 100 or p_email is null or length(p_email)>254
-     or p_email !~ '^[^[:space:]@<>]+@[^[:space:]@<>]+\.[^[:space:]@<>]+$'
-     or p_username is null or length(p_username) not between 2 and 80 then raise exception 'Please check your name, email and Loomii username'; end if;
+  p_name:=trim(p_name);p_email:=null;p_username:=trim(p_username);
+  if p_name is null or length(p_name) not between 2 and 100
+     or p_username is null or length(p_username) not between 2 and 80 then raise exception 'Please check your name and Loomii username'; end if;
   if p_screenshot is null or p_screenshot !~ ('^'||uid::text||'/[0-9a-f-]+\.(png|jpg|webp)$') then raise exception 'Invalid screenshot path'; end if;
   if not exists(select 1 from storage.objects where bucket_id='offer-screenshots' and name=p_screenshot) then raise exception 'Upload a screenshot before submitting'; end if;
   select * into previous from public.offer_submissions where user_id=uid for update;

@@ -5,7 +5,7 @@ import { PGlite } from '@electric-sql/pglite';
 import { validateSubmission,validateScreenshot,MAX_SCREENSHOT_BYTES } from '../offers/shared.js';
 
 test('submission details and screenshot types are validated',()=>{
-  assert.deepEqual(validateSubmission({name:' Test Person ',email:'User@Example.com',username:' loomii-test '}),{name:'Test Person',email:'user@example.com',username:'loomii-test'});
+  assert.deepEqual(validateSubmission({name:' Test Person ',username:' loomii-test '}),{name:'Test Person',username:'loomii-test'});
   assert.throws(()=>validateSubmission({name:'A',email:'bad',username:'xx'}));
   assert.throws(()=>validateScreenshot({type:'image/svg+xml',size:100}));
   assert.throws(()=>validateScreenshot({type:'image/png',size:MAX_SCREENSHOT_BYTES+1}));
@@ -31,14 +31,17 @@ test('submission ownership, screenshot isolation, manual approval and resubmissi
       grant execute on function storage.foldername(text) to authenticated;`);
     await db.exec(readFileSync(new URL('../supabase/schema.sql',import.meta.url),'utf8'));
     await db.exec(readFileSync(new URL('../supabase/offer-submissions.sql',import.meta.url),'utf8'));
+    // Exercise the upgrade from the previous email-required database too.
+    await db.exec('alter table public.offer_submissions alter column email set not null');
+    await db.exec(readFileSync(new URL('../supabase/remove-offer-email.sql',import.meta.url),'utf8'));
     await db.exec(`insert into public.site_admins values('${admin}');set role anon;`);
     await assert.rejects(db.query('select * from public.offer_submissions'),/permission denied/);
     await assert.rejects(db.query("select public.submit_offer_proof('Person','person@test.com','test', $1)",[path]),/permission denied/);
     await db.exec(`reset role;set role authenticated;set request.jwt.claim.sub='${participant}';`);
     await assert.rejects(db.query("insert into storage.objects(bucket_id,name) values('offer-screenshots',$1)",[`${stranger}/test.png`]),/row-level security/);
     await db.query("insert into storage.objects(bucket_id,name) values('offer-screenshots',$1)",[path]);
-    const result=await db.query("select * from public.submit_offer_proof('Person','person@test.com','loomii-user',$1)",[path]);
-    const id=result.rows[0].id;assert.equal(result.rows[0].status,'pending');
+    const result=await db.query("select * from public.submit_offer_proof('Person',null,'loomii-user',$1)",[path]);
+    const id=result.rows[0].id;assert.equal(result.rows[0].status,'pending');assert.equal(result.rows[0].email,null);
     await assert.rejects(db.query("update public.offer_submissions set status='approved'"),/permission denied/);
     await assert.rejects(db.query("select public.review_offer_submission($1,'approved','')",[id]),/Administrator access/);
     await assert.rejects(db.query("select public.submit_offer_proof('Person','person@test.com','loomii-user',$1)",[path]),/already pending or approved/);

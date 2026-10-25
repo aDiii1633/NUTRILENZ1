@@ -1,19 +1,19 @@
 import './submissions.css';
 export function renderSubmissions(container,client,demo) {
   const root=document.createElement('div');root.className='submissions-workspace';container.replaceChildren(root);
-  root.innerHTML=`<div class="submission-toolbar"><label>Status<select id="submission-filter"><option value="pending">Awaiting review</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="all">All submissions</option></select></label><label>Search this page<input type="search" id="submission-search" placeholder="Name, email, Loomii username…"></label><button class="button secondary" id="submission-refresh">Refresh ↻</button></div><p class="submission-status" role="status" aria-live="polite"></p><div class="submission-list"></div><div class="submission-pagination"><button class="button secondary" id="submission-prev">← Previous</button><span id="submission-page">Page 1</span><button class="button secondary" id="submission-next">Next →</button></div>`;
+  root.innerHTML=`<div class="submission-toolbar"><label>Status<select id="submission-filter"><option value="pending">Awaiting review</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="all">All submissions</option></select></label><label>Search this page<input type="search" id="submission-search" placeholder="Name, Loomii username…"></label><button class="button secondary" id="submission-refresh">Refresh ↻</button></div><p class="submission-status" role="status" aria-live="polite"></p><div class="submission-list"></div><div class="submission-pagination"><button class="button secondary" id="submission-prev">← Previous</button><span id="submission-page">Page 1</span><button class="button secondary" id="submission-next">Next →</button></div>`;
   const $=selector=>root.querySelector(selector);let rows=[],page=0,sequence=0,loading=false;
   const status=(text,error=false)=>{$('.submission-status').textContent=text;$('.submission-status').classList.toggle('error',error);};
   const el=(tag,text,className='')=>{const node=document.createElement(tag);node.textContent=text;node.className=className;return node;};
   function draw(){
     const list=$('.submission-list');list.replaceChildren();const term=$('#submission-search').value.trim().toLowerCase();
-    const filtered=rows.filter(row=>`${row.participant_name} ${row.email} ${row.loomii_username} ${row.id}`.toLowerCase().includes(term));
+    const filtered=rows.filter(row=>`${row.participant_name} ${row.loomii_username} ${row.id}`.toLowerCase().includes(term));
     if(!filtered.length)list.append(el('p','No submissions found on this page.','submission-empty'));
     filtered.forEach(row=>{
       const card=el('article','','submission-card');const top=el('div','','submission-card-top');
       top.append(el('h3',row.participant_name),el('span',row.status,`submission-badge ${row.status}`));card.append(top);
       const details=el('dl','','submission-details');
-      for(const [label,value]of [['Email (self-reported)',row.email],['Loomii username (self-reported)',row.loomii_username],['Submitted',new Date(row.submitted_at).toLocaleString()],['Reference',row.id],['Attempts',String(row.attempts)]]){details.append(el('dt',label),el('dd',value));}
+      for(const [label,value]of [['Loomii username (self-reported)',row.loomii_username],['Submitted',new Date(row.submitted_at).toLocaleString()],['Reference',row.id],['Attempts',String(row.attempts)]]){details.append(el('dt',label),el('dd',value));}
       card.append(details);const actions=el('div','','submission-actions');
       const view=el('button','View private screenshot ↗','button secondary');view.type='button';
       view.addEventListener('click',async()=>{
@@ -49,7 +49,7 @@ export function renderSubmissions(container,client,demo) {
   async function load(){
     if(demo||!client){status('Connect Supabase and apply offer-submissions.sql to see real submissions here. Demo mode does not create participant records.');draw();return;}
     const request=++sequence;loading=true;status('Loading submissions…');$('#submission-refresh').disabled=true;
-    try{let query=client.from('offer_submissions').select('*').order('submitted_at',{ascending:false}).order('id').range(page*25,page*25+24);if($('#submission-filter').value!=='all')query=query.eq('status',$('#submission-filter').value);const {data,error}=await query;if(error)throw error;if(!root.isConnected||request!==sequence)return;rows=data;status(`${rows.length} submissions on this page. Email and Loomii IDs are supplied by participants; screenshots require manual review.`);}
+    try{let query=client.from('offer_submissions').select('*').order('submitted_at',{ascending:false}).order('id').range(page*25,page*25+24);if($('#submission-filter').value!=='all')query=query.eq('status',$('#submission-filter').value);const {data,error}=await query;if(error)throw error;if(!root.isConnected||request!==sequence)return;rows=data;status(`${rows.length} submissions on this page. Loomii IDs are supplied by participants; screenshots require manual review.`);}
     catch(error){if(root.isConnected&&request===sequence){rows=[];status(error.message,true);}}
     finally{if(root.isConnected&&request===sequence){loading=false;$('#submission-refresh').disabled=false;draw();}}
   }
