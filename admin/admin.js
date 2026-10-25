@@ -1,13 +1,15 @@
 import template from '../index.html?raw';
 import { configured, getClient } from '../cms/client.js';
 import { collectFields, defaultSettings, emptyContent, validateDocument, safeUrl, DEMO_KEY } from '../cms/model.js';
+import { renderSubmissions } from './submissions.js';
 
 const $ = selector => document.querySelector(selector);
 const client = getClient(true);
 const fields = collectFields(new DOMParser().parseFromString(template, 'text/html'));
-const groups = ['settings', ...new Set(fields.map(field => field.group))];
+const groups = ['submissions', 'settings', ...new Set(fields.map(field => field.group))];
 const names = {settings:'Website settings',announcement:'Announcement bar',navigation:'Navigation',hero:'Hero & floating cards','payment-strip':'Payment methods',tasks:'Task cards',calculator:'Earnings calculator','how-it-works':'How it works','comparison-section':'Comparison table',faq:'Questions & answers','cta-section':'Call to action',footer:'Footer'};
-let draft = emptyContent(), published = emptyContent(), revision = 1, active = 'settings', userId = '', demo = false, busy = false;
+names.submissions = 'Offer submissions';
+let draft = emptyContent(), published = emptyContent(), revision = 1, active = 'submissions', userId = '', demo = false, busy = false;
 const clone = value => JSON.parse(JSON.stringify(value));
 const dirty = () => JSON.stringify(draft) !== JSON.stringify(published);
 const draftKey = () => `nutrilenz:draft:${demo ? 'demo' : userId}:v1`;
@@ -77,6 +79,13 @@ function render() {
   $('#section-title').textContent = names[active] || active;
   $('#section-description').textContent = active === 'settings' ? 'The details that make your website yours.' : 'Edit the text and links in this section. Your layout stays in place.';
   const container = $('#editor-fields'); container.replaceChildren();
+  $('.publish-bar').hidden = active === 'submissions';
+  $('.editor-bottom').hidden = active === 'submissions';
+  $('#draft-state').hidden = active === 'submissions';
+  if (active === 'submissions') {
+    $('#section-description').textContent = 'Review private screenshots, see participant details, and unlock the claim step.';
+    renderSubmissions(container, client, demo); return;
+  }
   if (active === 'settings') settingSpecs.forEach(([key,label,type,hint]) => container.append(makeField({key,label,type,hint,value:draft.settings[key],original:defaultSettings[key],setting:true})));
   else fields.filter(field => field.group === active).forEach((field,index) => container.append(makeField({key:field.key,label:field.type === 'url' ? `Link ${index + 1} · ${field.node.textContent.trim().slice(0,55) || 'Home'}` : field.original,value:draft.text[field.key] ?? field.original,original:field.original,type:field.type === 'url' ? 'url' : field.original.length > 85 ? 'textarea' : 'text'})));
   updateState();
