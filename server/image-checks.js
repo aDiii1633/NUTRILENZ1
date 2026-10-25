@@ -2,6 +2,7 @@ import sharp from 'sharp';
 import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { createWorker } from 'tesseract.js';
+import { reviewDraft } from '../offers/review-draft.js';
 const require=createRequire(import.meta.url);
 const eng=require('@tesseract.js-data/eng');
 export const sha256=buffer=>createHash('sha256').update(buffer).digest('hex');
@@ -71,6 +72,7 @@ export async function inspectScreenshot(bytes,reference){
     if(!signals.reference_matches)issues.push('Your assigned verification reference was not found.');
     if(signals.example_watermark)issues.push('Example images cannot be submitted as task evidence.');
     const {oriented,...hashes}=fingerprint;
-    return {...hashes,report:{...signals,...stars,ocr_confidence:data.confidence,ocr_text:String(data.text).slice(0,12000),issues,ai_generated:'unverifiable',actual_installation:'unverifiable',synthetic_metadata_signal:fingerprint.synthetic_metadata_signal,requires_human_review:true},eligible_for_review:issues.length===0};
+    const review_text_matches=Boolean(reference)&&normalizeText(data.text).includes(normalizeText(reviewDraft(reference,false)));
+    return {...hashes,report:{...signals,...stars,review_text_matches,assigned_review_text:reference?reviewDraft(reference):null,ocr_confidence:data.confidence,ocr_text:String(data.text).slice(0,12000),issues,ai_generated:'unverifiable',actual_installation:'unverifiable',synthetic_metadata_signal:fingerprint.synthetic_metadata_signal,requires_human_review:true},eligible_for_review:issues.length===0};
   }finally{clearTimeout(timeout);await worker.terminate();}
 }

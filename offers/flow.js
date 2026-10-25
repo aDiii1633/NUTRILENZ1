@@ -1,6 +1,11 @@
 import { getClient } from '../cms/client.js';
 import { LOOMII_URL, CLAIM_URL, validateSubmission, validateScreenshot } from './shared.js';
 import './offer.css';
+import { reviewDraft } from './review-draft.js';
+
+let draftSeed;
+try { draftSeed=localStorage.getItem('nutrilenz:review-draft-seed');if(!draftSeed){draftSeed=crypto.randomUUID();localStorage.setItem('nutrilenz:review-draft-seed',draftSeed);} }
+catch { draftSeed=crypto.randomUUID(); }
 
 let client;
 let record = null;
@@ -45,10 +50,11 @@ function render() {
   });
   panel.querySelector('.offer-instructions li:last-child').append(exampleButton);
   const reference=el('div','','verification-reference');
-  reference.append(el('h3','Your unique verification text'),el('p','Write about your own actual experience. Add this reference line to your review so we can match your screenshot to your submission.'));
-  const text=el('p',challenge?.review_text||'Your reference will appear when secure submissions are available.','reference-text');reference.append(text);
-  const copy=el('button','Copy verification text','button secondary');copy.type='button';copy.disabled=!challenge;
-  copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(challenge.review_text);copy.textContent='Copied ✓';}catch{copy.textContent='Select and copy the text above';}});reference.append(copy);
+  reference.append(el('h3','Your review message'),el('p','Copy this draft and paste it into the Google Play review box. Use it only if it reflects your experience; edit it on Google Play if needed.'));
+  const reviewMessage=challenge?reviewDraft(challenge.code):reviewDraft(draftSeed,false);
+  const text=el('p',reviewMessage,'reference-text');reference.append(text);
+  const copy=el('button','Copy review message','button primary');copy.type='button';
+  copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(reviewMessage);copy.textContent='Review copied ✓';}catch{copy.textContent='Select and copy the review above';}});reference.append(copy);
   panel.querySelector('hr').before(reference);
   $('#submit-proof').disabled=!challenge;
   $('#proof-file').addEventListener('change',async event=>{

@@ -4,7 +4,8 @@
 
 - An initially hidden **Show example image** dialog under the Rate and review instruction.
 - An edited, explicitly illustrative screenshot using **DEMO USER** and a neutral avatar. The original private reviewer name/photo is not shipped.
-- A persistent, database-issued reference for each visitor. Participants write their own actual experience and add the unique reference line; the website does not invent a positive user experience for them.
+- A ready-to-copy neutral review draft under **Your review message**. A browser-stable draft is visible even before backend activation. Once connected, the draft is derived from the visitor's persistent database reference and includes that reference. Participants should use/edit the draft only when it reflects their experience; no fabricated praise is generated.
+- OCR reports whether the full suggested review draft matches. Edited drafts go to human review; the participant-specific reference remains the required identity-matching signal.
 - Server-side PNG/JPEG/WebP decoding with byte, dimension, animation and decompression limits.
 - Local English OCR using Tesseract, with packaged language data. Screenshot bytes are not sent to an external AI provider.
 - Checks for a readable Loomii title, the Your Review/Edit your review section, and the assigned reference. Known example labels are blocked.
