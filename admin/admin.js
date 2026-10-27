@@ -119,7 +119,15 @@ async function loadWorkspace() {
 $('#login-form').addEventListener('submit', async event => {
   event.preventDefault(); $('#login-error').textContent = ''; $('#login-button').disabled = true;
   try {
-    const {data,error} = await client.auth.signInWithPassword({email:$('#email').value.trim(), password:$('#password').value});
+    const login=$('#email').value.trim();
+    let response;
+    if(login.includes('@'))response=await client.auth.signInWithPassword({email:login,password:$('#password').value});
+    else{
+      const result=await fetch('/api/admin-login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:login,password:$('#password').value})});
+      const tokens=await result.json();if(!result.ok)throw new Error(tokens.error||'Could not sign in.');
+      response=await client.auth.setSession(tokens);
+    }
+    const {data,error}=response;
     if (error) throw error; userId = data.user.id; $('#password').value = '';
     await loadWorkspace();
   } catch(error) { $('#login-error').textContent = error.message; notice(error.message,'error'); }

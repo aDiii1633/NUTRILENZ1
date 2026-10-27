@@ -25,6 +25,8 @@ Never paste the service role key into chat, source code, or a `VITE_` variable. 
 
 ## 3. Create your admin
 
+The public project's `/admin/` also supports a configured username login. The requested username and a scrypt password hash have been placed in Vercel's server-only `ADMIN_USERNAME` and `ADMIN_PASSWORD_HASH` variables; no password is embedded in the frontend. Once the database SQL and `SUPABASE_SERVICE_ROLE_KEY` are configured, the first successful username login creates its confirmed Supabase account and allowlists it. Existing email/password admin sign-in is still supported. Without the schema/server key, username login returns a setup error and does not pretend to authenticate.
+
 In Supabase Authentication, create your own confirmed email/password user. In SQL Editor run, using that email:
 
 ```sql
@@ -33,7 +35,7 @@ select id from auth.users where email = 'YOUR_ADMIN_EMAIL'
 on conflict(user_id) do nothing;
 ```
 
-Open **https://www.nutrilenz.in/admin/** and sign in. **Offer submissions** shows participant names, Loomii IDs, timestamps, private screenshots, OCR warnings and review history. You can approve or reject with a reason. No default password is supplied. The separate admin deployment remains supported via `npm run build:admin`.
+Open **https://www.nutrilenz.in/admin/** and sign in. **Offer submissions** shows participant names, Loomii IDs, timestamps, status and review history. At the owner's request, screenshot previews and OCR text are hidden; inbox queries fetch only metadata. Screenshots are still kept in private storage for verification. You can approve or reject with a reason. The separate admin deployment remains supported via `npm run build:admin`; username login on a separate deployment also requires the server-only variables there.
 
 ## 4. Check the real flow
 

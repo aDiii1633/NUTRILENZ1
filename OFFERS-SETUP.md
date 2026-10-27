@@ -23,7 +23,7 @@ If you already ran the previous email-required version, run `supabase/remove-off
 
 Sign in to the separate Nutrilenz Studio deployment and open **Offer submissions**. The inbox defaults to pending submissions and supports status filtering, page navigation, and search within the loaded page.
 
-Each record shows participant details, submission time, reference, attempt count and verification status. **View private screenshot** generates an expiring signed URL. **View activity** shows submission and review events.
+Each record shows participant details, submission time, reference, attempt count and verification status. At the owner's request screenshot previews and OCR text are hidden; the inbox fetches only participant/status metadata. Images remain in private storage. **View activity** shows submission and review events.
 
 - **Approve screenshot** marks a pending submission approved. App20 continuation after saving remains independent of this decision.
 - **Reject submission** requires an explanatory note. The user sees it and can submit a replacement.

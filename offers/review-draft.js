@@ -1,17 +1,17 @@
 // Questions invite honest user-authored feedback rather than copied testimonials.
 const openings = [
-  'How easy was it to find your Loomii link and share it on Instagram?',
+  'Write about finding your Loomii link and sharing it on Instagram.',
   'Describe receiving anonymous messages from friends through Loomii.',
-  'How did creating your Loomii account and user ID work for you?',
+  'Describe creating your Loomii account and user ID.',
   'Describe the Loomii screen layout, navigation and text readability.',
-  'What happened when a friend opened your Loomii link to send a message?',
-  'How clear was Loomii about the sender staying anonymous?',
+  'Describe a friend opening your Loomii link to send a message.',
+  'Describe how Loomii explains the sender staying anonymous.',
   'Describe using your Loomii link in a WhatsApp status or social story.',
-  'How did Loomii perform on your phone? Mention any lag or errors.',
-  'Was it clear where to find new messages in Loomii?',
-  'What would you improve about writing and sending a message through Loomii?',
-  'Describe whether Loomii buttons and controls were easy to use on your phone.',
-  'What did you learn after trying Loomii with a friend for the first time?',
+  'Describe Loomii performance on your phone, including any lag or errors.',
+  'Describe finding and reading new messages in Loomii.',
+  'Write about composing and sending a message through Loomii.',
+  'Describe using Loomii buttons and controls on your phone.',
+  'Describe trying Loomii with a friend for the first time.',
 ];
 const endings = [
   'Describe what you actually tried and what you would improve.',

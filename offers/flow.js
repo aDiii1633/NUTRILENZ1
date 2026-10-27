@@ -61,7 +61,7 @@ async function submitProof(event) {
     if(!response.ok)throw new Error(result.error||'Screenshot could not be checked.');
     if(!canContinueToClaim(result))throw new Error('Your submission was not confirmed. Please try again.');
     record=result.submission;path=null;wizardState.file=null;render();message('Screenshot saved privately for admin review. Opening App20…');
-    window.location.assign(CLAIM_URL);
+    setTimeout(()=>window.location.assign(CLAIM_URL),1500);
   }catch(error){if(path&&client)await client.storage.from('offer-screenshots').remove([path]);if($('#proof-error'))$('#proof-error').textContent=error.message;else message(error.message,true);}
   finally {working=false;if($('#submit-proof')){$('#submit-proof').disabled=!challenge;$('#submit-proof').textContent='Submit & continue →';}}
 }

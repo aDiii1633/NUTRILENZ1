@@ -37,7 +37,7 @@ export function renderWizard({host,state,ready,record,submit,refresh}) {
   show(state.step||0);
   if(record?.status==='pending'||record?.status==='approved'){
     steps.forEach(n=>n.hidden=true);$('#wizard-count').textContent='SUBMISSION SAVED';$('#wizard-title').textContent=record.status==='approved'?'Screenshot approved':'Waiting for admin review';
-    const status=make('p',`Reference: ${record.id}`,'wizard-small'),link=make('a','Continue to App20 ↗','button primary');link.href=CLAIM_URL;modal.append(status,link);const check=make('button','Refresh review status','wizard-back');check.type='button';check.addEventListener('click',refresh);modal.append(check);
+    const status=make('p',`Screenshot submitted successfully. Reference: ${record.id}`,'wizard-small'),link=make('a','Continue to App20 ↗','button primary');link.href=CLAIM_URL;modal.append(status,link);const check=make('button','Refresh review status','wizard-back');check.type='button';check.addEventListener('click',refresh);modal.append(check);
   }
   if(wasOpen!==false)open();
 }
