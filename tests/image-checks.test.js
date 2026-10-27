@@ -56,7 +56,7 @@ test('server-only checker gates old RPCs and atomically blocks duplicate content
       create schema storage;create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);
       create table storage.objects(bucket_id text,name text);alter table storage.objects enable row level security;
       create function storage.foldername(name text) returns text[] language sql as $$select array[split_part(name,'/',1)]$$;`);
-    for(const file of ['schema.sql','offer-submissions.sql','image-verification.sql'])await db.exec(readFileSync(new URL('../supabase/'+file,import.meta.url),'utf8'));
+    await db.exec(readFileSync(new URL('../supabase/bootstrap-new-project.sql',import.meta.url),'utf8'));
     const path1=`${first}/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.png`,path2=`${second}/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb.png`;
     await db.query("insert into storage.objects values('offer-screenshots',$1),('offer-screenshots',$2)",[path1,path2]);
     await db.exec(`set role authenticated;set request.jwt.claim.sub='${first}'`);

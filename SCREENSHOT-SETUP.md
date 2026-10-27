@@ -1,11 +1,11 @@
 # Activate screenshots and the admin inbox
 
-The website has no database yet. Until this setup is complete, uploads stay disabled: no screenshot is silently discarded and no fake success redirects a visitor.
+The Supabase project has been created, and its supplied public key was verified against the Auth API. Live checks found that `site_content` and `offer_submissions` do not exist yet, and Anonymous Sign-In is disabled. The local `.env.local` now connects to the project; production settings and the server-only key are still required. Uploads stay disabled until setup is complete.
 
 ## 1. Create private storage
 
-1. Create a project at https://supabase.com/dashboard/new and wait for it to finish provisioning.
-2. Open SQL Editor. Run these files **once**, in order: `supabase/schema.sql`, `supabase/offer-submissions.sql`, `supabase/image-verification.sql`.
+1. Open the [project SQL Editor](https://supabase.com/dashboard/project/wzncvkpvjxaabijbsefe/sql/new).
+2. For this new project, paste and run **`supabase/bootstrap-new-project.sql` once**. It combines the three setup migrations in one transaction. Do not run both the bootstrap and the individual migrations. Existing databases require their appropriate individual migrations instead.
 3. Enable **Authentication → Anonymous Sign-Ins** for visitors. Do not make the `offer-screenshots` bucket public.
 
 ## 2. Connect Vercel
@@ -18,6 +18,8 @@ In the public Vercel project's **Settings → Environment Variables**, add these
 | `VITE_SUPABASE_ANON_KEY` | Publishable or legacy public anon key |
 | `SUPABASE_SERVICE_ROLE_KEY` | Server-only service role key |
 | `VITE_PUBLIC_SITE_URL` | `https://www.nutrilenz.in` |
+
+Use `https://wzncvkpvjxaabijbsefe.supabase.co` as the URL and the public publishable key you supplied. This application uses Vite: map that key to `VITE_SUPABASE_ANON_KEY`; the name also accepts Supabase's newer publishable key format. Next.js `NEXT_PUBLIC_` names and SSR cookie middleware are not used here. `@supabase/supabase-js` is already installed; `@supabase/ssr` is unnecessary for this browser application.
 
 Never paste the service role key into chat, source code, or a `VITE_` variable. Redeploy after adding the variables.
 
