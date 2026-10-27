@@ -3,10 +3,13 @@ import { CLAIM_URL, validateSubmission, validateScreenshot, canContinueToClaim }
 import './offer.css';
 import './wizard.css';
 import { renderWizard } from './wizard.js';
+import { nextFeedbackSeed } from './review-draft.js';
 
 let draftSeed;
 try { draftSeed=localStorage.getItem('nutrilenz:review-draft-seed');if(!draftSeed){draftSeed=crypto.randomUUID();localStorage.setItem('nutrilenz:review-draft-seed',draftSeed);} }
 catch { draftSeed=crypto.randomUUID(); }
+draftSeed=nextFeedbackSeed(draftSeed);
+try {localStorage.setItem('nutrilenz:review-draft-seed',draftSeed);}catch{}
 
 let client;
 let record = null;
