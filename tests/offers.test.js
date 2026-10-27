@@ -2,7 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { PGlite } from '@electric-sql/pglite';
-import { validateSubmission,validateScreenshot,MAX_SCREENSHOT_BYTES } from '../offers/shared.js';
+import { validateSubmission,validateScreenshot,MAX_SCREENSHOT_BYTES,canContinueToClaim } from '../offers/shared.js';
+
+test('App20 continuation requires a saved submission that passed server checks',()=>{
+  for(const result of [null,{}, {submission:{}}, {submission:{id:'saved',status:'rejected'}}, {error:'OCR failed'}])assert.equal(canContinueToClaim(result),false);
+  assert.equal(canContinueToClaim({submission:{id:'saved',status:'pending'}}),true);
+  assert.equal(canContinueToClaim({submission:{id:'saved',status:'approved'}}),true);
+});
 
 test('submission details and screenshot types are validated',()=>{
   assert.deepEqual(validateSubmission({name:' Test Person ',username:' loomii-test '}),{name:'Test Person',username:'loomii-test'});

@@ -2,6 +2,9 @@ export const LOOMII_URL = 'https://play.google.com/store/apps/details?id=com.loo
 export const CLAIM_URL = 'https://www.app20.in/';
 export const MAX_SCREENSHOT_BYTES = 5 * 1024 * 1024;
 export const SCREENSHOT_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
+export function canContinueToClaim(result) {
+  return Boolean(result?.submission?.id && ['pending','approved'].includes(result.submission.status));
+}
 export function validateSubmission({name,username}) {
   if (typeof name !== 'string' || name.trim().length < 2 || name.trim().length > 100) throw new Error('Enter your name (2–100 characters).');
   if (typeof username !== 'string' || username.trim().length < 2 || username.trim().length > 80) throw new Error('Enter your Loomii username (2–80 characters).');

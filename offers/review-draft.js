@@ -1,19 +1,19 @@
-// Neutral drafts describe the app rather than inventing praise or a user's experience.
+// Questions invite honest user-authored feedback rather than copied testimonials.
 const openings = [
-  'Loomii is an app for anonymous questions and answers.',
-  'Loomii focuses on anonymous Q&A.',
-  'Anonymous questions and answers are the main idea behind Loomii.',
-  'Loomii brings an anonymous Q&A format to a mobile app.',
-  'The Loomii app is built around anonymous questions and replies.',
-  'Loomii offers a place for anonymous questions and answers.',
+  'How did sharing your Loomii link on an Instagram story work for you?',
+  'What was your experience receiving anonymous messages from friends through Loomii?',
+  'How easy or difficult was creating your Loomii link and sharing it in a status?',
+  'Was the anonymous messaging experience in Loomii clear to you?',
+  'What happened when a friend opened your Loomii link and sent a message?',
+  'What would make sharing a Loomii link and receiving anonymous messages better?',
 ];
 const endings = [
-  'Sharing my feedback on that experience here.',
-  'This review is about its anonymous Q&A experience.',
-  'Leaving my feedback about the app here.',
-  'My feedback here relates to the app and its Q&A format.',
-  'Sharing a review of the app and its question-and-answer format.',
-  'This is my review of the anonymous question-and-answer experience.',
+  'Describe what you actually tried and what you would improve.',
+  'Share what worked and what did not, in your own words.',
+  'Include something you personally tried and any problems you encountered.',
+  'Describe your own experience, including any confusion or difficulties.',
+  'Write honest feedback based on your own use of the app.',
+  'Mention what you would change; any rating or criticism is welcome.',
 ];
 export function reviewDraft(code, includeReference = true) {
   let seed = 2166136261;

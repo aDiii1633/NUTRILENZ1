@@ -1,6 +1,8 @@
 # Loomii offer submissions
 
-All main earning buttons now open `/#offer`. Step 1 shows Loomii installation/account/review instructions and a screenshot form. Participants provide a name, Loomii username and PNG/JPEG/WebP screenshot (up to 5 MB). Screenshots are private and reviewed manually. Approval unlocks Step 2 with the requested App20 link. A successful upload alone never counts as approval.
+All main earning buttons open `/#offer`. The initial screen shows the Loomii download link. Opening Google Play enables **Next**, which opens a scrollable dialog with account instructions, a stable randomly selected feedback prompt, name, Loomii username and screenshot upload (PNG/JPEG/WebP, up to 5 MB). Opening the store does not prove installation. Prompts ask for real user-authored feedback and do not prescribe a rating or a testimonial.
+
+After the server completes OCR/duplicate checks and confirms a saved pending/approved submission, the browser redirects to App20. Failed checks, upload errors or an unconfigured backend never redirect. Returning pending participants can continue using the App20 link. Screenshots remain private and final admin review stays pending; navigating to App20 is not approval or payment confirmation. This redesign requires no new database migration beyond the existing image verification setup.
 
 **Google Play prohibits incentivized ratings/reviews. Requiring a five-star review in exchange for a reward risks action against Loomii. Review the campaign requirement before launch:** [Google Play ratings policy](https://support.google.com/googleplay/android-developer/answer/9898684?hl=en). The requested review copy is in `offers/flow.js`; database infrastructure can also be used for account/task proof without a rating condition.
 
