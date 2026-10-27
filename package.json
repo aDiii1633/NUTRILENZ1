@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "dev:admin": "vite --config vite.admin.config.js --host 127.0.0.1 --port 5174",
-    "build": "vite build",
+    "build": "vite build && vite build --config vite.admin.config.js --base /admin/ --outDir ../dist/admin",
     "build:admin": "vite build --config vite.admin.config.js",
     "build:all": "npm run build && npm run build:admin",
     "preview": "vite preview --host 127.0.0.1",

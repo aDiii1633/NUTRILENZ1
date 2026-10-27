@@ -1,8 +1,8 @@
 # Loomii offer submissions
 
-All main earning buttons open `/#offer`. The initial screen shows a copyable, randomly selected feedback prompt, **Try another prompt**, instructions and then the Loomii download link. Opening Google Play enables **Next**, which opens a scrollable dialog with name, Loomii username and screenshot upload (PNG/JPEG/WebP, up to 5 MB). Opening the store does not prove installation. Prompts ask for real user-authored feedback and do not prescribe a rating or a testimonial. Changing prompts preserves the server verification reference. Phone layouts use wrapping controls, 16px form fields, a scrollable modal and background scroll locking.
+All main earning buttons open `/#offer` and launch one compact three-step dialog: **copy a feedback prompt and read instructions → download Loomii → enter name, Loomii ID and screenshot**. Only one step is visible at a time, with Back buttons and preserved form values. Steps fit common phone viewports; very small screens, the keyboard and enlarged text retain a scroll fallback. Opening the store does not prove installation. Prompts ask for real user-authored feedback and do not prescribe a rating or testimonial.
 
-After the server completes OCR/duplicate checks and confirms a saved pending/approved submission, the browser redirects to App20. Failed checks, upload errors or an unconfigured backend never redirect. Returning pending participants can continue using the App20 link. Screenshots remain private and final admin review stays pending; navigating to App20 is not approval or payment confirmation. This redesign requires no new database migration beyond the existing image verification setup.
+After server image decoding/duplicate checks and a confirmed saved pending/approved submission, the browser redirects to App20. OCR mismatches or unavailable OCR go to manual review instead of rejecting a decodable image. Duplicate/example images, upload errors or an unconfigured backend never redirect. Returning pending participants can continue using the App20 link. Screenshots remain private and final admin review stays pending; navigating to App20 is not approval or payment confirmation. No new migration is needed beyond the existing image verification setup. The public build includes the protected admin application at `/admin/`; see [SCREENSHOT-SETUP.md](SCREENSHOT-SETUP.md) for first-time activation.
 
 **Google Play prohibits incentivized ratings/reviews. Requiring a five-star review in exchange for a reward risks action against Loomii. Review the campaign requirement before launch:** [Google Play ratings policy](https://support.google.com/googleplay/android-developer/answer/9898684?hl=en). The requested review copy is in `offers/flow.js`; database infrastructure can also be used for account/task proof without a rating condition.
 
@@ -25,7 +25,7 @@ Sign in to the separate Nutrilenz Studio deployment and open **Offer submissions
 
 Each record shows participant details, submission time, reference, attempt count and verification status. **View private screenshot** generates an expiring signed URL. **View activity** shows submission and review events.
 
-- **Approve & unlock step 2** marks a pending submission approved.
+- **Approve screenshot** marks a pending submission approved. App20 continuation after saving remains independent of this decision.
 - **Reject submission** requires an explanatory note. The user sees it and can submit a replacement.
 - Already-reviewed submissions cannot be reviewed twice; concurrent decisions are rejected.
 

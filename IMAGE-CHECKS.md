@@ -4,8 +4,8 @@
 
 - An initially hidden **Show example image** dialog under the Rate and review instruction.
 - An edited, explicitly illustrative screenshot using **DEMO USER** and a neutral avatar. The original private reviewer name/photo is not shipped.
-- A ready-to-copy neutral review draft under **Your review message**. A browser-stable draft is visible even before backend activation. Once connected, the draft is derived from the visitor's persistent database reference and includes that reference. Participants should use/edit the draft only when it reflects their experience; no fabricated praise is generated.
-- OCR reports whether the full suggested review draft matches. Edited drafts go to human review; the participant-specific reference remains the required identity-matching signal.
+- A copyable, random genuine-feedback question in the first wizard step. It can be shuffled; users write their own feedback instead of pasting a fabricated testimonial.
+- OCR signals are advisory. Missing title, review text or reference goes to a pending manual review instead of discarding a valid upload. An OCR failure retains decoded-image fingerprints and adds a warning for the admin.
 - Server-side PNG/JPEG/WebP decoding with byte, dimension, animation and decompression limits.
 - Local English OCR using Tesseract, with packaged language data. Screenshot bytes are not sent to an external AI provider.
 - Checks for a readable Loomii title, the Your Review/Edit your review section, and the assigned reference. Known example labels are blocked.
@@ -15,7 +15,7 @@
 The duplicate registry covers images processed through this checker. Uploads made before this migration need a separate fingerprint backfill to participate in historical duplicate comparisons.
 - A perceptual hash comparison against the 300 most recent accepted checks. Similarity is flagged for manual comparison rather than automatically rejected: Play screenshots have similar layouts, and heavily cropped/edited copies can evade this heuristic.
 - Admin reports and a **Blocked image checks** inbox filter. Private OCR text and images are visible only to the owner and allowlisted admins.
-- Successful automatic checks create a pending submission. Only admin approval unlocks the claim link; the browser cannot call the old submit RPC to bypass checks.
+- A successfully saved upload creates a pending submission and redirects to App20; this does not approve the screenshot or confirm payment. Only an admin can approve/reject it. The browser cannot call the old submit RPC to bypass decoding and duplicate checks.
 
 ## Limits that must remain explicit
 

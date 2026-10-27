@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
-import { inspectScreenshot,distance } from '../server/image-checks.js';
+import { distance } from '../server/image-checks.js';
+import { inspectForManualReview } from '../server/manual-review.js';
 import { validateSubmission } from '../offers/shared.js';
 
 export default async function handler(req,res){
@@ -24,7 +25,7 @@ export default async function handler(req,res){
     checkId=job.id;
     const download=await db.storage.from('offer-screenshots').download(path);
     if(download.error||!download.data)throw new Error('The uploaded screenshot could not be opened.');
-    const result=await inspectScreenshot(Buffer.from(await download.data.arrayBuffer()),challenge.code);
+    const result=await inspectForManualReview(Buffer.from(await download.data.arrayBuffer()),challenge.code);
     const {data:recent,error:recentError}=await db.from('screenshot_checks').select('perceptual_hash').eq('decision','review_required').order('created_at',{ascending:false}).limit(300);
     if(recentError)throw new Error('Duplicate checks are temporarily unavailable.');
     result.report.similar_image_signal=(recent||[]).some(row=>distance(row.perceptual_hash,result.perceptual_hash)<=4);

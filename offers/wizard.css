@@ -1,0 +1,18 @@
+/* Scoped after the general offer styles so phone defaults cannot enlarge steps. */
+.offer-wizard.offer-panel{padding:16px 20px;max-height:calc(100dvh - 24px)}
+.offer-wizard.offer-panel h2{font-size:24px;line-height:1.2;margin:4px 0 10px;max-width:none}
+#wizard-title:focus{outline:none}
+.offer-wizard.offer-panel label{font-size:12px;line-height:1.4;margin:8px 0;gap:4px}
+.offer-wizard.offer-panel input:not([type=checkbox]){min-height:44px;padding:10px;font-size:16px}
+.offer-wizard.offer-panel input[type=file]{font-size:12px;padding:8px!important}
+.offer-wizard.offer-panel .offer-consent{font-size:11px;line-height:1.45;margin:10px 0 4px;gap:8px}
+.offer-wizard.offer-panel .wizard-small{font-size:11px;line-height:1.45;margin:5px 0}
+.offer-wizard.offer-panel .wizard-file>span{font-size:10px}
+.offer-wizard.offer-panel .wizard-header{min-height:44px}
+.offer-wizard.offer-panel .wizard-prompt{font-size:14px;padding:13px;line-height:1.6}
+.offer-wizard.offer-panel .wizard-hint{font-size:13px;line-height:1.5;margin:8px 0}
+.offer-wizard.offer-panel .wizard-instructions{font-size:12px;line-height:1.5;margin:12px 0 4px}
+.offer-wizard.offer-panel form>.button{font-size:14px;min-height:46px}
+.offer-wizard.offer-panel .offer-form-error{font-size:11px;line-height:1.4;margin:3px 0}
+.offer-wizard.offer-panel .wizard-copy-actions .button{white-space:normal;font-size:12px;padding:10px 8px;min-height:44px}
+@media(max-height:650px){.offer-wizard.offer-panel{padding:10px 16px}.offer-wizard.offer-panel h2{font-size:22px;margin-bottom:8px}.offer-wizard.offer-panel label{margin:6px 0}.offer-wizard .wizard-dots{margin-bottom:8px}.offer-wizard.offer-panel .wizard-prompt{margin:8px 0;padding:10px}.offer-wizard.offer-panel .wizard-instructions{font-size:11px;margin-top:9px}.offer-wizard.offer-panel .wizard-small{font-size:10px}.offer-wizard.offer-panel .wizard-back{min-height:36px;padding:6px}}

@@ -17,7 +17,8 @@ export function renderSubmissions(container,client,demo) {
       card.append(details);
       if(row.verification_report){
         const report=row.verification_report;const checkDetails=el('details','','verification-report');checkDetails.append(el('summary','Automated image checks'));
-        for(const [label,value]of [['Loomii title',report.loomii_visible?'Detected':'Not detected'],['Review section',report.review_visible?'Detected':'Not detected'],['Verification reference',report.reference_matches?'Matched':'Not matched'],['Full review draft',report.review_text_matches?'Matched':'Different or edited; inspect manually'],['Open + Uninstall UI',report.install_ui_visible?'Visible signal only':'Uncertain'],['Five-star visual signal',report.five_stars_signal?'Five blue shapes detected; check manually':'Uncertain'],['Exact duplicate',report.exact_duplicate?'Yes':'No'],['Similar image',report.similar_image_signal?'Flagged for comparison':'No recent match flagged'],['AI generated','Cannot be reliably determined'],['Actual app installation','Cannot be proven from a screenshot']])checkDetails.append(el('p',label+': '+value));
+        if(report.review_mode==='manual')checkDetails.append(el('p',`Manual review required. OCR: ${report.ocr_status||'unknown'}. Missing text signals do not prove a screenshot is invalid.`));
+        for(const [label,value]of [['Loomii title',report.loomii_visible?'Detected':'Not detected'],['Review section',report.review_visible?'Detected':'Not detected'],['Verification reference',report.reference_matches?'Matched':'Not matched'],['Prompt text (not required)',report.review_text_matches?'Matched':'Different or edited; inspect manually'],['Open + Uninstall UI',report.install_ui_visible?'Visible signal only':'Uncertain'],['Five-star visual signal',report.five_stars_signal?'Five blue shapes detected; check manually':'Uncertain'],['Exact duplicate',report.exact_duplicate?'Yes':'No'],['Similar image',report.similar_image_signal?'Flagged for comparison':'No recent match flagged'],['AI generated','Cannot be reliably determined'],['Actual app installation','Cannot be proven from a screenshot']])checkDetails.append(el('p',label+': '+value));
         (report.issues||[]).forEach(issue=>checkDetails.append(el('p',issue)));
         if(report.ocr_text){const text=el('pre',report.ocr_text);checkDetails.append(text);}card.append(checkDetails);
       }
@@ -39,13 +40,13 @@ export function renderSubmissions(container,client,demo) {
       if(row.status==='pending'){
         const label=el('label','Review note / rejection reason');const note=document.createElement('textarea');note.maxLength=2000;note.rows=2;note.placeholder='Explain anything the participant needs to fix…';label.append(note);card.append(label);
         const decisions=el('div','','submission-actions');
-        for(const [decision,title]of [['approved','Approve & unlock step 2'],['rejected','Reject submission']]){
+        for(const [decision,title]of [['approved','Approve screenshot'],['rejected','Reject submission']]){
           const button=el('button',title,`button ${decision==='approved'?'primary':'secondary'}`);button.type='button';
           button.addEventListener('click',async()=>{
             if(decision==='rejected'&&note.value.trim().length<3){note.focus();status('Add a reason so the participant knows what to fix.',true);return;}
-            if(!confirm(`${decision==='approved'?'Approve this screenshot and unlock the App20 step':'Reject this screenshot'} for ${row.participant_name}?`))return;
+            if(!confirm(`${decision==='approved'?'Approve this screenshot':'Reject this screenshot'} for ${row.participant_name}?`))return;
             const buttons=card.querySelectorAll('button');buttons.forEach(item=>item.disabled=true);
-            try{const {error}=await client.rpc('review_offer_submission',{p_id:row.id,p_status:decision,p_note:note.value});if(error)throw error;await load();status(`Submission ${decision}. ${decision==='approved'?'Step 2 is now available to this participant.':'The participant can submit an updated screenshot.'}`);}catch(error){status(error.message,true);buttons.forEach(item=>item.disabled=false);}
+            try{const {error}=await client.rpc('review_offer_submission',{p_id:row.id,p_status:decision,p_note:note.value});if(error)throw error;await load();status(`Submission ${decision}. ${decision==='approved'?'Your review decision is saved.':'The participant can submit an updated screenshot.'}`);}catch(error){status(error.message,true);buttons.forEach(item=>item.disabled=false);}
           });decisions.append(button);
         }card.append(decisions);
       }else{card.append(el('p',`${row.status==='blocked'?'Image checks blocked this upload.':'Reviewed'} ${row.reviewed_at?new Date(row.reviewed_at).toLocaleString():''}${row.review_note?' · '+row.review_note:''}`,'submission-review-note'));}

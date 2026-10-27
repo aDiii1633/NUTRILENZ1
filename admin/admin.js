@@ -14,7 +14,7 @@ const clone = value => JSON.parse(JSON.stringify(value));
 const dirty = () => JSON.stringify(draft) !== JSON.stringify(published);
 const draftKey = () => `nutrilenz:draft:${demo ? 'demo' : userId}:v1`;
 function notice(text, type = '') { $('#notice').textContent = text; $('#notice').className = `notice ${type}`; }
-const siteUrl = import.meta.env.VITE_PUBLIC_SITE_URL || (import.meta.env.DEV ? 'http://127.0.0.1:5173' : '');
+const siteUrl = import.meta.env.VITE_PUBLIC_SITE_URL || (import.meta.env.DEV ? 'http://127.0.0.1:5173' : (location.pathname.startsWith('/admin/') ? location.origin : ''));
 if (safeUrl(siteUrl, true)) $('#open-site').href = siteUrl;
 else { $('#open-site').removeAttribute('href'); $('#open-site').textContent = 'Set VITE_PUBLIC_SITE_URL'; }
 
