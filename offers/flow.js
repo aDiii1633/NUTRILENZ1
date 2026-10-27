@@ -46,6 +46,9 @@ function render() {
     for(const [field,key] of [['name','participant_name'],['username','loomii_username']])panel.querySelector(`[name="${field}"]`).value=record[key];
   }
   body.append(panel);
+  panel.querySelector('.offer-step-label').textContent='START HERE / PREPARE YOUR FEEDBACK';
+  panel.querySelector('h2').textContent='Your Loomii feedback.';
+  panel.querySelector('.loomii-download .offer-step-label').textContent='NEXT / DOWNLOAD LOOMII';
   const exampleButton=el('button','Show example image','button secondary example-image-button');
   exampleButton.type='button';exampleButton.addEventListener('click',()=>{
     const modal=document.createElement('dialog');modal.className='example-dialog';modal.setAttribute('aria-label','Example review screenshot');
@@ -56,12 +59,16 @@ function render() {
   panel.querySelector('.offer-instructions li:last-child').append(exampleButton);
   const reference=el('div','','verification-reference');
   reference.append(el('h3','Your feedback prompt'),el('p','Use this question to write about your own experience. Do not paste the question as a review. Any rating or criticism is welcome. Include the reference line with your own feedback so we can match your screenshot.'));
-  const reviewMessage=challenge?reviewDraft(challenge.code):reviewDraft(draftSeed,false);
+  let reviewMessage=reviewDraft(draftSeed,false)+(challenge?`\n\nReview reference: ${challenge.code}`:'');
   const text=el('p',reviewMessage,'reference-text');reference.append(text);
   const copy=el('button','Copy feedback prompt','button primary');copy.type='button';
   copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(reviewMessage);copy.textContent='Prompt copied ✓';}catch{copy.textContent='Select and copy the prompt above';}});reference.append(copy);
+  const shuffle=el('button','Try another prompt ↻','button secondary');shuffle.type='button';
+  shuffle.addEventListener('click',()=>{let next;do{draftSeed=crypto.randomUUID();next=reviewDraft(draftSeed,false)+(challenge?`\n\nReview reference: ${challenge.code}`:'');}while(next===reviewMessage);reviewMessage=next;text.textContent=next;copy.textContent='Copy feedback prompt';try{localStorage.setItem('nutrilenz:review-draft-seed',draftSeed);}catch{}});reference.append(shuffle);
   if(challenge){const copyReference=el('button','Copy reference only','button secondary');copyReference.type='button';copyReference.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(`Review reference: ${challenge.code}`);copyReference.textContent='Reference copied ✓';}catch{copyReference.textContent='Select the reference line above';}});reference.append(copyReference);}
-  panel.querySelector('hr').before(reference);
+  const instructions=panel.querySelector('.offer-instructions');
+  instructions.before(reference);
+  instructions.after(panel.querySelector('.loomii-download'));
   $('#submit-proof').disabled=!challenge;
   $('#proof-file').addEventListener('change',async event=>{
     clearPreview();$('#proof-preview').hidden=true;$('#proof-error').textContent='';
@@ -75,12 +82,14 @@ function render() {
   modal.setAttribute('aria-labelledby','offer-details-title');
   const close=el('button','×','close-dialog');close.type='button';close.setAttribute('aria-label','Close submission details');close.addEventListener('click',()=>modal.close());
   const title=el('h2','Your details & screenshot');title.id='offer-details-title';modal.append(close,title);
-  while(download.nextSibling)modal.append(download.nextSibling);
+  const formStart=panel.querySelector('hr');
+  while(formStart.nextSibling)modal.append(formStart.nextSibling);
+  formStart.remove();
   body.append(modal);
-  const next=el('button',downloadOpened?'Next: add your details →':'Download Loomii to continue','button primary offer-next');next.type='button';next.disabled=!downloadOpened;
+  const next=el('button',downloadOpened?'Next: fill the form →':'Open download link to continue','button primary offer-next');next.type='button';next.disabled=!downloadOpened;
   const openDetails=()=>{detailsOpen=true;modal.showModal();};
   next.addEventListener('click',openDetails);panel.append(next);
-  download.querySelector('a').addEventListener('click',()=>{downloadOpened=true;next.disabled=false;next.textContent='Next: add your details →';});
+  download.querySelector('a').addEventListener('click',()=>{downloadOpened=true;next.disabled=false;next.textContent='Next: fill the form →';});
   modal.addEventListener('close',()=>{detailsOpen=false;});
   if(detailsOpen||record?.status==='rejected')openDetails();
 }
